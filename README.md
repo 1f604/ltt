@@ -1,6 +1,14 @@
 # ltt
 ltt - Linux Time Tracker 
 
+- [ltt](#ltt)
+- [What is it?](#what-is-it)
+- [How to use](#how-to-use)
+- [Features](#features)
+- [Why did I make this?](#why-did-i-make-this)
+- [Feature requests](#feature-requests)
+- [License](#license)
+
 # What is it?
 
 Basically [ManicTime](https://www.manictime.com) for Linux. If you're not familiar with ManicTime, there's a nice video tutorial [here](https://www.youtube.com/watch?v=3lBCzW9P5mY) and [here](https://www.youtube.com/watch?v=A-Wp24Lr37k).
