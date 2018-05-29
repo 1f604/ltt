@@ -6,6 +6,7 @@ ltt - Linux Time Tracker
 - [Table of contents](#table-of-contents)
 - [What is it?](#what-is-it)
 - [How to use](#how-to-use)
+- [Architecture](#architecture)
 - [Features](#features)
 - [Why did I make this?](#why-did-i-make-this)
 - [Feature requests](#feature-requests)
