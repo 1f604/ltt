@@ -19,6 +19,29 @@ Basically [ManicTime](https://www.manictime.com) for Linux. If you're not famili
 
 ...to be written...
 
+# Architecture
+
+There are 2 components, the logger, which gathers data, and the visualizer, which visualizes the data. 
+
+Logger's responsibilities:
+
+- Timestamp data with duration
+- Determine if user is active or idle 
+- Determine what application is active
+- Log the window name
+- Log the URL or document name if applicable
+- Download the html at URL and save it into a cache (avoiding duplicates) - this will be without authentication, so websites that require login will not be logged
+- Link the cache with the records in the log (maybe use an ID)
+
+Visualizer's responsibilities: 
+
+- Summary statistics, on activity, application, document, and tag level, to sort applications/URLs/tags by time spent in a time range
+- Bar charts and timelines
+- Allow viewing chunks by full URL, host name, or domain name
+- UI for tagging chunks of time and selecting chunks by URL/application 
+- Allow tagging applications / URLs forever or by time period, e.g time spent on youtube could be either study or procrastination
+- Full text browser history search (non-authenticated pages only)
+
 # Features 
 
 Implemented:
@@ -31,7 +54,7 @@ Todo:
 - Track name of active window
 - Track application usage, like the application timeline in ManicTime
 - Allow applications and websites to be tagged into groups so you can tag games as procrastination and IDE as programming for summary statistics
-- Produce nice tagging UI that hides already-tagged websites and duplicates as well as allows you to drag or multi-select (like ctrl-click) websites to tag multiple websites together
+- Produce nice tagging UI that hides already-tagged websites and duplicates as well as allow you to drag or multi-select (like ctrl-click) websites to tag multiple websites together
 - Produce nice summary statistics showing how much active time you spent in each application, which documents you spent time editing, which websites you spent most time on, which tags you spent time on etc
 - Produce more powerful browser history, showing days and times where a particular URL was visited and for how long it was visited each day. 
 - Summary for individual days, weeks, months and so on. Allow users to select a date range that the statistics will be computed over. 
