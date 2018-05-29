@@ -24,10 +24,7 @@ Todo:
 - Allow for easy browsing over each day to see day duration, active times, top applications, top documents (including websites). 
 - Maybe track individual documents as well (not sure how ManicTime does it)
 - Maybe produce a nice chart/UI like ManicTime does
-
-Low priority:
-
-- Tags timeline
+- Tags timeline, except instead of just tags it will be an "event" with category, tags and description
 
 
 # Why did I make this? 
