@@ -17,6 +17,7 @@ Todo:
 - Track name of active window
 - Track application usage, like the application timeline im ManicTime
 - Allow applications and websites to be tagged into groups so you can tag games as procrastination and IDE as programming for summary statistics
+- Produce nice tagging UI that hides already-tagged websites and duplicates as well as allows you to drag or multi-select (like ctrl-click) websites to tag multiple websites together
 - Produce nice summary statistics showing how much active time you spent in each application, which documents you spent time editing, which websites you spent most time on, which tags you spent time on etc
 - Produce more powerful browser history, showing days and times where a particular URL was visited and for how long it was visited each day. 
 - Summary for individual days, weeks, months and so on. Allow users to select a date range that the statistics will be computed over. 
