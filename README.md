@@ -11,6 +11,10 @@ Basically [ManicTime](https://www.manictime.com) for Linux. If you're not famili
 
 # Features 
 
+Implemented:
+
+- Nothing
+
 Todo:
 
 - Track computer usage (idle vs active), like the activity timeline in ManicTime
