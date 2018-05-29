@@ -12,6 +12,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import ctypes
 import os
+from subprocess import Popen, PIPE
+from shlex import split
 
 """
 Usage:
@@ -52,6 +54,9 @@ class ActivityTracker(object):
 
     def is_user_inactive(self):
         """ Checks whether the user is inactive based on inactivity threshold """
+        """ Also checks if screen is locked """
+        if self.get_screen_locked():
+            return True
         inactivity_duration = self.get_inactivity_time()
         if inactivity_duration > self.inactivity_threshold:
             if not self.user_inactive:
@@ -63,3 +68,12 @@ class ActivityTracker(object):
     def get_inactivity_time(self):
         self.xss.XScreenSaverQueryInfo(self.dpy, self.root, self.xss_info)
         return self.xss_info.contents.idle 
+        
+    def get_screen_locked(self):
+        bashCommand = "gdbus call -e -d com.canonical.Unity -o /com/canonical/Unity/Session -m com.canonical.Unity.Session.IsLocked"
+        command2 = "grep -ioP \"(true)|(false)\""
+        p1 = Popen(split(bashCommand), stdout=PIPE)
+        p2 = Popen(split(command2), stdin=p1.stdout, stdout=PIPE) 
+        p1.stdout.close()
+        output = p2.communicate()
+        return output[0].strip('\n') == "true"
