@@ -29,7 +29,7 @@ Todo:
 
 - Track computer usage (idle vs active), like the activity timeline in ManicTime
 - Track name of active window
-- Track application usage, like the application timeline im ManicTime
+- Track application usage, like the application timeline in ManicTime
 - Allow applications and websites to be tagged into groups so you can tag games as procrastination and IDE as programming for summary statistics
 - Produce nice tagging UI that hides already-tagged websites and duplicates as well as allows you to drag or multi-select (like ctrl-click) websites to tag multiple websites together
 - Produce nice summary statistics showing how much active time you spent in each application, which documents you spent time editing, which websites you spent most time on, which tags you spent time on etc
