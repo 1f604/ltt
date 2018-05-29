@@ -38,7 +38,7 @@ Visualizer's responsibilities:
 
 - Summary statistics, on activity, application, document, and tag level, to sort applications/URLs/tags by time spent in a time range
 - Bar charts and timelines
-- Allow viewing chunks by full URL, host name, or domain name
+- Allow chunking by full URL, host name, or domain name
 - UI for tagging chunks of time and selecting chunks by URL/application 
 - Allow tagging applications / URLs forever or by time period, e.g time spent on youtube could be either study or procrastination
 - Full text browser history search (non-authenticated pages only)
