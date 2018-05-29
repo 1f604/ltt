@@ -1,7 +1,9 @@
 # ltt
 ltt - Linux Time Tracker 
 
+# Table of contents
 - [ltt](#ltt)
+- [Table of contents](#table-of-contents)
 - [What is it?](#what-is-it)
 - [How to use](#how-to-use)
 - [Features](#features)
