@@ -14,13 +14,6 @@ def t2s(t): #timedelta to seconds string
 def s2t(s): #seconds string to timedelta
     return datetime.timedelta(seconds=int(s))
 
-def detectsleep():
-    global lastloggedtime
-    timediff = datetime.datetime.now() - lastloggedtime
-    if timediff > datetime.timedelta(seconds=1):
-        print "Slept:", t2s(timediff)
-    lastloggedtime = datetime.datetime.now()
-
 def mainloop():
     for i in range(50000):
         print datetime.datetime.now(), a.is_user_inactive()
