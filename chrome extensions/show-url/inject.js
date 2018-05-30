@@ -9,7 +9,24 @@ function doit() {
 }
 
 doit();
-
+document.addEventListener('DOMContentLoaded', function() {
+    doit();
+ }, false);
 window.onload = function () {
     doit();
 }
+setTimeout(function(){
+    doit();
+   }, 1000);
+setTimeout(function(){
+    doit();
+   }, 2000);
+setTimeout(function(){
+    doit();
+   }, 3000);
+setTimeout(function(){
+    doit();
+    }, 4000);
+setTimeout(function(){
+    doit();
+    }, 5000);
