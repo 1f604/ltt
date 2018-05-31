@@ -26,6 +26,15 @@ class ApplicationInfo(object):
         self.url = None
         self.document = None
 
+def get_chromium_url(a):
+    if " |url:" not in a.window_title:
+        a.url = None
+        return
+    s = a.window_title.split(" |url:")[-1]
+    s = s.split(" ")[0]
+    if s:
+        a.url = s
+
 def get_application():
     """ Fetches active window info using xprop. """
     a = ApplicationInfo()
@@ -52,5 +61,7 @@ def get_application():
     a.wm_window_role = role
     if role == "browser":
         a.is_browser = True
+    if window_class == "chromium-browser":
+        get_chromium_url(a)
     return a
 
