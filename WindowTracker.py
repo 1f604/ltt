@@ -10,15 +10,24 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+chromium_title_suffix = " - Chromium"
 
 import subprocess
 
+def rchop(thestring, ending):
+  if thestring.endswith(ending):
+    return thestring[:-len(ending)]
+  else:
+    print "Error: Expected Chromium window title to end with", ending
+    exit(1)
+  return thestring
 
 class ApplicationInfo(object):
     def __init__(self):
         self.is_browser = False
         self.has_document = False
         self.application_name = None
+        self.wm_title_class = None
         self.window_title = None
         self.window_class = None
         self.window_instance = None
@@ -27,11 +36,13 @@ class ApplicationInfo(object):
         self.document = None
 
 def get_chromium_url(a):
+    a.window_title = rchop(a.window_title, chromium_title_suffix)
     if " |url:" not in a.window_title:
         a.url = None
         return
-    s = a.window_title.split(" |url:")[-1]
-    s = s.split(" ")[0]
+    s = a.window_title.split(" |url:")
+    a.window_title = s[0]
+    s = s[-1]#.split(" ")[0]
     if s:
         a.url = s
 
