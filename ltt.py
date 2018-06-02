@@ -1,5 +1,5 @@
-inactivity_timeout = 6
-recheck_url_days = 1
+inactivity_timeout = 600 #10 minutes for my screensaver to kick in
+recheck_url_days = 1 #unused option for now.
 
 import urllib2
 import threading
@@ -116,7 +116,7 @@ def statechange(state):
 def mainloop():
     while True:
         sleep(0.05) #0.05 seems fast enough to capture the 1 inactivity before suspend, at least on my system.
-        if AT.is_user_inactive():
+        if AT.is_user_inactive():            
             statechange(("inactive",None))
         else:
             application = w.get_application()
