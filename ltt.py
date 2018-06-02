@@ -105,19 +105,7 @@ def statechange(state):
             s.add(DBStructures.LogEntry(unicode(laststate[0]), None, None, None, now(), duration, None, None))
         else:
             app = laststate[1]
-            entry = DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, now(), duration, app.url, None)
-            s.add(entry)            
-            s.flush() #need this line to get entry id
-            if app.is_browser and app.url != None:
-                if now() - lastchecked[app.url] > timedelta(days=recheck_url_days):
-                    lasthtmlhash[app.url] = "" #force recheck
-                if lasthtmlhash[app.url] == "":
-                    t = Thread(target=check_url_updated, args=(app.url,entry.id))
-                    t.daemon = True #helps with debugging
-                    #ok because only 1 thread will access the same entry ever. 
-                    t.start()
-                else: #just write hash in
-                    entry.texthash = lasthtmlhash[app.url]
+            s.add(DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, now(), duration, app.url, None))            
         s.commit()
         laststate = state
         laststatechange = now()
