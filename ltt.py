@@ -1,4 +1,4 @@
-inactivity_timeout = 6
+inactivity_timeout = 600
 recheck_url_days = 1
 
 import urllib2
@@ -34,7 +34,7 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Connection': 'keep-alive'}
 
 session = sessionmaker()
-engine = create_engine('sqlite:///sqlalchemy_example.db', connect_args={'check_same_thread': False}, echo=False)
+engine = create_engine('sqlite:///sqlalchemy_example.db')
 session.configure(bind=engine)
 DBStructures.Base.metadata.create_all(engine)
 s = session()
@@ -68,7 +68,8 @@ def download_text(url):
         print e
     return text
 
-def check_url_updated(url, entry_id):
+def check_url_updated(url, entry_id):    
+    s = session()
     lastchecked[url] = now()
     lasthash = lasthtmlhash[url]
     x = download_text(url)
@@ -132,7 +133,7 @@ def mainloop():
             statechange(("inactive",None))
         else:
             application = w.get_application()
-            statechange((application.window_title+application.window_class,application))
+            statechange((application.window_title+application.window_class+str(application.url),application))
             
 
 mainloop()
