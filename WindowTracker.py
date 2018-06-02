@@ -13,13 +13,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 chromium_title_suffix = " - Chromium"
 
 import subprocess
+import sys  
+reload(sys)  
+sys.setdefaultencoding('utf8')
 
 def rchop(thestring, ending):
   if thestring.endswith(ending):
     return thestring[:-len(ending)]
   else:
     print "Error: Expected Chromium window title to end with", ending
-    exit(1)
+    #exit(1)
   return thestring
 
 class ApplicationInfo(object):
@@ -31,7 +34,6 @@ class ApplicationInfo(object):
         self.window_title = None
         self.window_class = None
         self.window_instance = None
-        self.wm_window_role = None
         self.url = None
         self.document = None
 
@@ -56,23 +58,23 @@ def get_application():
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
     title = window.communicate()[0].strip().split('"', 1)[-1][:-1]
-    wm_window_role = subprocess.Popen(["xprop", "-id", active_id, "WM_WINDOW_ROLE"],
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
-    role = wm_window_role.communicate()[0].strip().split('"', 1)[-1][:-1]
     wm_class = subprocess.Popen(["xprop", "-id", active_id, "WM_CLASS"],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
     wm_class_message = wm_class.communicate()[0].strip().split('"')
-    window_class = wm_class_message[1]
-    window_instance = wm_class_message[3]
-    a.window_title = title
-    a.window_class = window_class
-    a.window_instance = window_instance
-    a.wm_window_role = role
-    if role == "browser":
-        a.is_browser = True
+    if len(wm_class_message) > 3:
+        window_class = wm_class_message[1]
+        window_instance = wm_class_message[3]
+    else:
+        window_class = None
+        window_instance = None
+    a.window_title = unicode(title)
+    a.window_class = unicode(window_class)
+    a.window_instance = unicode(window_instance)
     if window_class == "chromium-browser":
+        a.is_browser = True
         get_chromium_url(a)
     return a
+
+
 
