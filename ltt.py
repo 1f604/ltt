@@ -31,7 +31,7 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Connection': 'keep-alive'}
 
 session = sessionmaker()
-engine = create_engine('sqlite:///sqlalchemy_example.db')
+engine = create_engine('sqlite:///logs.db')
 session.configure(bind=engine)
 DBStructures.Base.metadata.create_all(engine)
 s = session()
