@@ -1,5 +1,5 @@
 inactivity_timeout = 600
-recheck_url_days = 10
+recheck_url_days = 1
 filedir = "visited"
 
 import urllib2
@@ -110,7 +110,7 @@ def check_url_updated(url, entry_id):
     end_url_check(s, uentry)
 
 def is_expired(uentry):
-    return now() - uentry.last_checked > timedelta(seconds=recheck_url_days)
+    return now() - uentry.last_checked > timedelta(days=recheck_url_days)
 
 def statechange(state):
     statetitle = state[0]
