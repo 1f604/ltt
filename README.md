@@ -75,7 +75,7 @@ This software is mainly for my own use. It is supposed to be used by individuals
 
 If you want a feature, ask for it. If I think it's useful, then I'll implement it. If I think it's useless, then either implement it yourself or pay me to implement it. 
 
-I will not be maintaining this for distros that I'm not using. I'm currently using Ubuntu 16.04, so this software is only checked to work on Ubuntu 16.04. When I upgrade to a new distro (either Ubuntu 18.04 or 20.04) then this will be updated appropriately. 
+I will not be maintaining this for distros that I'm not using. I'm currently using Ubuntu 16.04, so this software is only checked to work on Ubuntu 16.04. When I upgrade to a new distro (either Ubuntu 18.04 or 20.04) then this will be updated accordingly. 
 
 # License
 
