@@ -11,7 +11,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from sqlalchemy import Column, Integer, DateTime, Unicode #, UnicodeText
+from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean #, UnicodeText
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
@@ -48,19 +48,19 @@ class urlEntry(Base):
     __tablename__ = 'urls'
 
     id = Column(Integer, primary_key=True)
-    texthash = Column(Unicode)
+    unexpiredhash = Column(Unicode)
     url = Column(Unicode)
-    first_downloaded = Column(DateTime)
     last_checked = Column(DateTime)
+    is_being_downloaded = Column(Boolean)
     #text = Column(UnicodeText)
 
-    def __init__(self, texthash, url, first_downloaded, last_checked):
-        self.texthash = texthash
+    def __init__(self, url, unexpiredhash, last_checked,is_being_downloaded):
         self.url = url
-        self.first_downloaded = first_downloaded
+        self.unexpiredhash = unexpiredhash
         self.last_checked = last_checked
+        self.is_being_downloaded = is_being_downloaded
 
     def __repr__(self):
         return "<urlEntry(%s, %s, %s, %s)>" % \
-               (self.texthash, self.url, self.first_downloaded, self.last_checked)
+               (self.url, self.unexpiredhash, self.last_checked, str(self.is_being_downloaded))
                 

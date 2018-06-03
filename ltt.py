@@ -1,5 +1,5 @@
 inactivity_timeout = 600
-recheck_url_days = 1
+recheck_url_days = 10
 
 import urllib2
 import threading
@@ -22,9 +22,6 @@ AT = ActivityTracker(inactivity_timeout)
 laststate = ("inactive",None)
 laststatechange = now()
 http_timeout = 10
-
-lasthtmlhash = defaultdict(str)
-lastchecked = defaultdict(lambda: datetime.datetime(1900,01,01))
 
 hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -67,39 +64,50 @@ def download_text(url):
     except Exception as e:
         print e
     return text
+    
+def end_url_check(s, uentry):
+    uentry.last_checked = now()
+    uentry.is_being_downloaded = False
+    s.commit()
+    s.close()
 
 def check_url_updated(url, entry_id):    
     s = session()
-    lastchecked[url] = now()
-    lasthash = lasthtmlhash[url]
+    uentry = s.query(DBStructures.urlEntry).filter_by(url=url).first()
+    lasthash = uentry.unexpiredhash
     x = download_text(url)
     if x == -1:
         print "url not text:", url
+        uentry.unexpiredhash = u"not text"
+        end_url_check(s, uentry)
         return
     entry = s.query(DBStructures.LogEntry).get(entry_id)
     if x == None:
         print "failed to download url:", url
-        lastchecked[url] = datetime.datetime(1900,01,01) #reset so we can re-download next time. 
         entry.texthash = u"failed to download"
-        s.commit()        
+        uentry.unexpiredhash = None
+        end_url_check(s, uentry)
         return
     newhash = unicode(hashlib.sha256(x.encode('utf-8')).hexdigest())
     entry.texthash = newhash
-    s.commit()
     if lasthash != newhash:
-        print "new text detected"
-        print x
-        #TODO: write html to file
-        lasthtmlhash[url] = newhash
+        print "new text detected:",newhash
+        #print x
+        #TODO: write html to file 
+        uentry.unexpiredhash = newhash
+        end_url_check(s, uentry)
         return
     print "old text detected"
+    end_url_check(s, uentry)
 
+def is_expired(uentry):
+    return now() - uentry.last_checked > timedelta(seconds=recheck_url_days)
 
 def statechange(state):
     statetitle = state[0]
     global laststate
     global laststatechange
-    if laststate[0] != statetitle:
+    if laststate[0] != statetitle: #this should happen only when user switches tabs
         for thread in threading.enumerate(): print(thread.name)
         duration = (now() - laststatechange).total_seconds()
         if laststate[0] == "inactive":
@@ -110,15 +118,24 @@ def statechange(state):
             s.add(entry)            
             s.flush() #need this line to get entry id
             if app.is_browser and app.url != None:
-                if now() - lastchecked[app.url] > timedelta(days=recheck_url_days):
-                    lasthtmlhash[app.url] = "" #force recheck
-                if lasthtmlhash[app.url] == "":
+                uentry = s.query(DBStructures.urlEntry).filter_by(url=app.url).first()
+                if not uentry: #if not exists
+                    uentry = DBStructures.urlEntry(app.url,None,now(),False)
+                    s.add(uentry)
+                    s.commit()
+                if is_expired(uentry):
+                    uentry.unexpiredhash = None #force recheck
+                    s.commit()
+                if uentry.unexpiredhash == None and uentry.is_being_downloaded == False:
+                    uentry.is_being_downloaded = True
+                    s.commit()
                     t = Thread(target=check_url_updated, args=(app.url,entry.id))
                     t.daemon = True #helps with debugging
-                    #ok because only 1 thread will access the same entry ever. 
                     t.start()
-                else: #just write hash in
-                    entry.texthash = lasthtmlhash[app.url]
+                elif uentry.unexpiredhash == None and uentry.is_being_downloaded:
+                    entry.texthash = u"was downloading, see previous entry"
+                else: #hash is not None, so write it in
+                    entry.texthash = uentry.unexpiredhash
         s.commit()
         laststate = state
         laststatechange = now()
