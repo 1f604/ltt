@@ -1,5 +1,6 @@
 inactivity_timeout = 600
 recheck_url_days = 10
+filedir = "visited"
 
 import urllib2
 import threading
@@ -16,6 +17,7 @@ from collections import defaultdict
 import hashlib
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+import os.path
 now = datetime.datetime.now
 
 AT = ActivityTracker(inactivity_timeout)
@@ -64,12 +66,20 @@ def download_text(url):
     except Exception as e:
         print e
     return text
-    
+
 def end_url_check(s, uentry):
     uentry.last_checked = now()
     uentry.is_being_downloaded = False
     s.commit()
     s.close()
+
+def write_to_file(text,texthash):
+    filename = filedir+"/"+texthash+".txt"
+    if not os.path.exists(filedir):
+        os.makedirs(filedir)
+    if not os.path.isfile(filename):
+        with open(filename, "w") as text_file:
+            text_file.write(text)
 
 def check_url_updated(url, entry_id):    
     s = session()
@@ -92,8 +102,7 @@ def check_url_updated(url, entry_id):
     entry.texthash = newhash
     if lasthash != newhash:
         print "new text detected:",newhash
-        #print x
-        #TODO: write html to file 
+        write_to_file(x, newhash)
         uentry.unexpiredhash = newhash
         end_url_check(s, uentry)
         return
