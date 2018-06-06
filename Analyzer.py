@@ -48,8 +48,8 @@ print start,end
 def tf(interval):
     return str(timedelta(seconds=interval)).split('.')[0]
 
-def f2p(num):
-    return str(num*100)[0:4]+"%"
+def f2p(num, cum):
+    return str(num*100)[0:4]+"/"+str(cum*100)[0:4]+"%"
     
 def printlog(logs, title, index, attribute):
     log = logs.group_by(attribute).order_by(ordering)
@@ -60,12 +60,18 @@ def printlog(logs, title, index, attribute):
         print "The logs are empty"
         return
     print title+":"
+    cum_active = 0
+    cum_chromium = 0
     for l in log:
         if l[index] != None:
+            chrm_dur =  l[0] / chromium_duration
+            cum_chromium += chrm_dur
+            act_dur = l[0] / active_duration
+            cum_active += act_dur
             if attribute == LogEntry.domainname or attribute == LogEntry.url and chromium_duration > 0:
-                print tf(l[0]), f2p(l[0] / chromium_duration), f2p(l[0] / active_duration), l[index]
+                print tf(l[0]), f2p(chrm_dur , cum_chromium), f2p(act_dur , cum_active), l[index]
             else:
-                print tf(l[0]), f2p(l[0] / active_duration), l[index]
+                print tf(l[0]), f2p(act_dur , cum_active), l[index]
     print "======================================"
 def main():
     global active_duration
