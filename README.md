@@ -6,6 +6,7 @@ ltt - Linux Time Tracker
 - [Table of contents](#table-of-contents)
 - [What is it?](#what-is-it)
 - [How to use](#how-to-use)
+- [Files](#files)
 - [Architecture](#architecture)
 - [Features](#features)
 - [Why did I make this?](#why-did-i-make-this)
@@ -18,7 +19,22 @@ Basically [ManicTime](https://www.manictime.com) for Linux. If you're not famili
 
 # How to use
 
-...to be written...
+`python ltt.py` to start logging your activity
+
+Better still put it in Startup Applications (command: `python /path/to/ltt.py`). 
+
+Run ltt.py for as long as you want your time tracked, it's ok to start and stop it at any time, since it writes to the database every time you switch window focus. 
+
+When you want to view your stats you can open `logs.db` using any sqlite viewer or:
+
+`python Analyzer.py`
+
+You can see the options in `Analyzer.py`. Note that you can use either `-x` (to see past x days) or `-s` + `-e` (to specify an interval of days to see) but you should not use both. 
+
+# Files
+
+`logs.db` contains all the windows logs showing you when you did what and for how long
+`visited` contains all the html downloaded, so you can grep through it for something you've seen in the past
 
 # Architecture
 
@@ -26,41 +42,34 @@ There are 2 components, the logger, which gathers data, and the visualizer, whic
 
 Logger's responsibilities:
 
-- Timestamp data with duration
-- Determine if user is active or idle 
-- Determine what application is active
-- Log the window name
-- Log the URL or document name if applicable
+- Log activity with timestamp and duration
+    - Activity - if user is active or idle 
+    - Instance - which application is active
+    - Title - name of currently active window
+    - Log the URL if using chromium with extension
 - Download the html at URL and save it into a cache (avoiding duplicates) - this will be without authentication, so websites that require login will not be logged
-- Link the cache with the records in the log (maybe use an ID)
 
-Visualizer's responsibilities: 
+Analyzer's responsibilities: 
 
-- Summary statistics, on activity, application, document, and tag level, to sort applications/URLs/tags by time spent in a time range
-- Bar charts and timelines
-- Allow chunking by full URL, host name, or domain name
-- UI for tagging chunks of time and selecting chunks by URL/application 
-- Allow tagging applications / URLs forever or by time period, e.g time spent on youtube could be either study or procrastination
-- Full text browser history search (non-authenticated pages only)
+- Show duration and % of active duration of each application
+- Show duration and % of total chromium duration and % of active duration of each domain and URL
 
 # Features 
 
 Implemented:
 
-- Nothing
-
-Todo:
-
-- Track computer usage (idle vs active), like the activity timeline in ManicTime
+- Track computer usage (idle vs active)
 - Track name of active window
-- Track application usage, like the application timeline in ManicTime
-- Allow applications and websites to be tagged into groups so you can tag games as procrastination and IDE as programming for summary statistics
+- Track application usage
+- Analyzer shows you how much active time you spent in each application and window title, which domains and websites you spent most time on (Chromium only), sorted in descending order of duration
+- Analyzer allows you to select a date range that the statistics will be computed over, e.g today, past week, or custom date range. 
+
+Not implemented:
+
+- Allow applications and websites to be tagged into groups for analysis
 - Produce nice tagging UI that hides already-tagged websites and duplicates as well as allow you to drag or multi-select (like ctrl-click) websites to tag multiple websites together
-- Produce nice summary statistics showing how much active time you spent in each application, which documents you spent time editing, which websites you spent most time on, which tags you spent time on etc
+- Support for documents
 - Produce more powerful browser history, showing days and times where a particular URL was visited and for how long it was visited each day. 
-- Summary for individual days, weeks, months and so on. Allow users to select a date range that the statistics will be computed over. 
-- Allow for easy browsing over each day to see day duration, active times, top applications, top documents (including websites). 
-- Maybe track individual documents as well (not sure how ManicTime does it)
 - Maybe produce a nice chart/UI like ManicTime does
 - Tags timeline, except instead of just tags it will be an "event" (/task) with category, tags and description
 
