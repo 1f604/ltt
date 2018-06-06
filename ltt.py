@@ -1,11 +1,12 @@
 #!/usr/bin/python
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+filedir = os.path.dirname(os.path.realpath(__file__))+"/visited"
 inactivity_timeout = 600
 recheck_url_days = 1
-filedir = "visited"
 download_html = True
 
 import urllib2
-import threading
 from threading import Thread
 import DBStructures 
 from bs4 import BeautifulSoup
@@ -15,7 +16,6 @@ from time import sleep
 import datetime
 from datetime import timedelta
 import dateutil.parser
-from collections import defaultdict
 import hashlib
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -35,8 +35,6 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Connection': 'keep-alive'}
 
 session = sessionmaker()
-import os 
-dir_path = os.path.dirname(os.path.realpath(__file__))
 engine = create_engine('sqlite:///'+dir_path+'/logs.db')
 session.configure(bind=engine)
 DBStructures.Base.metadata.create_all(engine)
