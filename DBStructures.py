@@ -24,12 +24,13 @@ class LogEntry(Base):
     window_class = Column(Unicode)
     window_instance = Column(Unicode)
     url = Column(Unicode)
+    domainname = Column(Unicode)
     texthash = Column(Unicode)
     timestamp = Column(DateTime)
     duration = Column(Integer)
 
     def __init__(self, activity, window_title, window_class, window_instance, date,
-                duration, url, texthash):
+                duration, url, domainname, texthash):
         self.activity_state = activity
         self.window_title = window_title
         self.window_class = window_class
@@ -37,12 +38,13 @@ class LogEntry(Base):
         self.timestamp = date
         self.duration = duration
         self.url = url
+        self.domainname = domainname
         self.texthash = texthash
 
     def __repr__(self):
         return "<LogEntry(%s, %s, %s, %s, %s, %s, %s, %s)>" % \
                (self.activity_state, self.window_title, self.window_class, self.window_instance,
-                str(self.timestamp), str(self.duration), self.url, self.texthash)
+                str(self.timestamp), str(self.duration), self.url, self.domainname, self.texthash)
 
 class urlEntry(Base):
     __tablename__ = 'urls'

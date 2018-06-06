@@ -2,3 +2,4 @@ logs/*
 visited/*
 *.db
 *.pyc
+tags.py

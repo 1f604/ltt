@@ -1,6 +1,7 @@
 inactivity_timeout = 600
 recheck_url_days = 1
 filedir = "visited"
+download_html = True
 
 import urllib2
 import threading
@@ -44,7 +45,7 @@ def getDateTimeFromISO8601String(s):
     return d
 
 def get_text_from_html(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, 'html.parser')
     for script in soup(["script", "style"]):
         script.extract()    # rip it out
     text = soup.get_text()
@@ -58,13 +59,13 @@ def download_text(url):
         http_message = f.info()        
         main = http_message.maintype # 'text'
         if main != "text":
-            print "not text"
+            print("not text")
             return -1
         html = f.read()
         f.close()
         text = get_text_from_html(html)
     except Exception as e:
-        print e
+        print(e)
     return text
 
 def end_url_check(s, uentry):
@@ -87,13 +88,13 @@ def check_url_updated(url, entry_id):
     lasthash = uentry.unexpiredhash
     x = download_text(url)
     if x == -1:
-        print "url not text:", url
+        print("url not text:", url)
         uentry.unexpiredhash = u"not text"
         end_url_check(s, uentry)
         return
     entry = s.query(DBStructures.LogEntry).get(entry_id)
     if x == None:
-        print "failed to download url:", url
+        print("failed to download url:", url)
         entry.texthash = u"failed to download"
         uentry.unexpiredhash = None
         end_url_check(s, uentry)
@@ -101,12 +102,12 @@ def check_url_updated(url, entry_id):
     newhash = unicode(hashlib.sha256(x.encode('utf-8')).hexdigest())
     entry.texthash = newhash
     if lasthash != newhash:
-        print "new text detected:",newhash
+        print("new text detected:",newhash)
         write_to_file(x, newhash)
         uentry.unexpiredhash = newhash
         end_url_check(s, uentry)
         return
-    print "old text detected"
+    print("old text detected")
     end_url_check(s, uentry)
 
 def is_expired(uentry):
@@ -117,16 +118,16 @@ def statechange(state):
     global laststate
     global laststatechange
     if laststate[0] != statetitle: #this should happen only when user switches tabs
-        for thread in threading.enumerate(): print(thread.name)
+        #for thread in threading.enumerate(): print(thread.name)
         duration = (now() - laststatechange).total_seconds()
         if laststate[0] == "inactive":
-            s.add(DBStructures.LogEntry(unicode(laststate[0]), None, None, None, now(), duration, None, None))
+            s.add(DBStructures.LogEntry(unicode(laststate[0]), None, None, None, now(), duration, None, None, None))
         else:
             app = laststate[1]
-            entry = DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, now(), duration, app.url, None)
+            entry = DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, now(), duration, app.url, app.domainname, None)
             s.add(entry)            
             s.flush() #need this line to get entry id
-            if app.is_browser and app.url != None:
+            if download_html and app.is_browser and app.url != None:
                 uentry = s.query(DBStructures.urlEntry).filter_by(url=app.url).first()
                 if not uentry: #if not exists
                     uentry = DBStructures.urlEntry(app.url,None,now(),False)

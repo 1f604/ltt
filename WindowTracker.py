@@ -14,6 +14,7 @@ chromium_title_suffix = " - Chromium"
 
 import subprocess
 import sys  
+from urlparse import urlparse
 reload(sys)  
 sys.setdefaultencoding('utf8')
 
@@ -21,7 +22,7 @@ def rchop(thestring, ending):
   if thestring.endswith(ending):
     return thestring[:-len(ending)]
   else:
-    print "Error: Expected Chromium window title to end with", ending
+    print("Error: Expected Chromium window title to end with", ending)
     #exit(1)
   return thestring
 
@@ -35,6 +36,7 @@ class ApplicationInfo(object):
         self.window_class = None
         self.window_instance = None
         self.url = None
+        self.domainname = None
         self.document = None
 
 def get_chromium_url(a):
@@ -46,6 +48,7 @@ def get_chromium_url(a):
     a.window_title = s[0]
     s = s[-1]#.split(" ")[0]
     if s:
+        a.domainname = urlparse(s).hostname
         a.url = s
 
 def get_application():
