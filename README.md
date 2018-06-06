@@ -33,6 +33,8 @@ When you want to view your stats you can open `logs.db` using any sqlite viewer 
 
 You can see the options in `Analyzer.py`. Note that you can use either `-x` (to see past x days) or `-s` + `-e` (to specify an interval of days to see) but you should not use both. 
 
+You need to install the Chromium plugin in order to log your URLs. 
+
 # Files
 
 `logs.db` contains all the windows logs showing you when you did what and for how long
