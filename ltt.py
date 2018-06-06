@@ -1,3 +1,4 @@
+#!/usr/bin/python
 inactivity_timeout = 600
 recheck_url_days = 1
 filedir = "visited"
@@ -59,7 +60,7 @@ def download_text(url):
         http_message = f.info()        
         main = http_message.maintype # 'text'
         if main != "text":
-            print("not text")
+            #print("not text")
             return -1
         html = f.read()
         f.close()
@@ -102,7 +103,7 @@ def check_url_updated(url, entry_id):
     newhash = unicode(hashlib.sha256(x.encode('utf-8')).hexdigest())
     entry.texthash = newhash
     if lasthash != newhash:
-        print("new text detected:",newhash)
+        #print("new text detected:",newhash)
         write_to_file(x, newhash)
         uentry.unexpiredhash = newhash
         end_url_check(s, uentry)
