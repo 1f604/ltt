@@ -17,6 +17,8 @@ ltt - Linux Time Tracker
 
 Basically [ManicTime](https://www.manictime.com) for Linux. If you're not familiar with ManicTime, there's a nice video tutorial [here](https://www.youtube.com/watch?v=3lBCzW9P5mY) and [here](https://www.youtube.com/watch?v=A-Wp24Lr37k).
 
+Except currently it doesn't have UI, so it's more like an improved version of [latte](https://github.com/flakas/Latte) with support for URL logging (currently Chromium only) and downloading a text copy of every web page you visit so you can search through them later. 
+
 # How to use
 
 `python ltt.py` to start logging your activity
