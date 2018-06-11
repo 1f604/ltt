@@ -23,8 +23,6 @@ import os.path
 now = datetime.datetime.now
 
 AT = ActivityTracker(inactivity_timeout)
-laststate = ("inactive",None)
-laststatechange = now()
 http_timeout = 10
 
 hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
@@ -113,55 +111,91 @@ def check_url_updated(url, entry_id):
 
 def is_expired(uentry):
     return now() - uentry.last_checked > timedelta(days=recheck_url_days)
+        
+def down_url_html(app,entry,end):
+    if download_html and app.is_browser and app.url != None:
+        uentry = s.query(DBStructures.urlEntry).filter_by(url=app.url).first()
+        if not uentry: #if not exists
+            uentry = DBStructures.urlEntry(app.url,None,end,False)
+            s.add(uentry)
+            s.commit()
+        if is_expired(uentry):
+            uentry.unexpiredhash = None #force recheck
+            s.commit()
+        if uentry.unexpiredhash == None and uentry.is_being_downloaded == False:
+            uentry.is_being_downloaded = True
+            s.commit()
+            t = Thread(target=check_url_updated, args=(app.url,entry.id))
+            t.daemon = True #helps with debugging
+            t.start()
+        elif uentry.unexpiredhash == None and uentry.is_being_downloaded:
+            entry.texthash = u"was downloading, see previous entry"
+        else: #hash is not None, so write it in
+            entry.texthash = uentry.unexpiredhash
 
-def statechange(state):
+def statechange(start,end,laststate,state):
     statetitle = state[0]
-    global laststate
-    global laststatechange
     if laststate[0] != statetitle: #this should happen only when user switches tabs
+        print "statechange:",start,end,laststate,state
         #for thread in threading.enumerate(): print(thread.name)
-        duration = (now() - laststatechange).total_seconds()
+        duration = (end - start).total_seconds()
         if laststate[0] == "inactive":
-            s.add(DBStructures.LogEntry(unicode(laststate[0]), None, None, None, now(), duration, None, None, None))
+            s.add(DBStructures.LogEntry(unicode(laststate[0]), None, None, None, start, duration, None, None, None))
         else:
             app = laststate[1]
-            entry = DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, now(), duration, app.url, app.domainname, None)
+            entry = DBStructures.LogEntry(unicode("active"), app.window_title, app.window_class, app.window_instance, start, duration, app.url, app.domainname, None)
             s.add(entry)            
             s.flush() #need this line to get entry id
-            if download_html and app.is_browser and app.url != None:
-                uentry = s.query(DBStructures.urlEntry).filter_by(url=app.url).first()
-                if not uentry: #if not exists
-                    uentry = DBStructures.urlEntry(app.url,None,now(),False)
-                    s.add(uentry)
-                    s.commit()
-                if is_expired(uentry):
-                    uentry.unexpiredhash = None #force recheck
-                    s.commit()
-                if uentry.unexpiredhash == None and uentry.is_being_downloaded == False:
-                    uentry.is_being_downloaded = True
-                    s.commit()
-                    t = Thread(target=check_url_updated, args=(app.url,entry.id))
-                    t.daemon = True #helps with debugging
-                    t.start()
-                elif uentry.unexpiredhash == None and uentry.is_being_downloaded:
-                    entry.texthash = u"was downloading, see previous entry"
-                else: #hash is not None, so write it in
-                    entry.texthash = uentry.unexpiredhash
+            down_url_html(app,entry,end)
         s.commit()
-        laststate = state
-        laststatechange = now()
         return True
     return False
 
-
-def mainloop():
+def didsuspend(lastactive1,lastactive2):
+    cur = now()
+    return cur - lastactive1 > timedelta(seconds=1) or cur - lastactive2 > timedelta(seconds=1)
+    
+def mainloop():    
+    global laststate
+    global laststatechange
+    inactivestate = ("inactive",None)
+    laststate = inactivestate
+    laststatechange = now()
+    lastactive1 = now()
+    lastactive2 = now()
+    suspend = False
     while True:
-        sleep(0.05) #0.05 seems fast enough to capture the 1 inactivity before suspend, at least on my system.
-        if AT.is_user_inactive():
-            statechange(("inactive",None))
+        lastactive1 = now() #all this effort just to make sure we detect the suspend. 
+        user_inactive = AT.is_user_inactive() #Log shows that suspend probably happens here.
+        if didsuspend(lastactive1,lastactive2):
+            suspend = True; lastactive = min(lastactive1,lastactive2)
+        lastactive2 = now()
+        if didsuspend(lastactive1,lastactive2):
+            suspend = True; lastactive = min(lastactive1,lastactive2)
+        if suspend: #if system was suspended
+            print "system slept for:", now() - lastactive
+            print laststatechange, lastactive, laststate, inactivestate
+            if statechange(laststatechange, lastactive, laststate, inactivestate): #if last state pre sleep was inactive, don't do anything
+                #otherwise, set laststatechange to just before sleep, and set last state to inactive
+                laststatechange = lastactive
+            laststate = inactivestate #if last state pre sleep was inactive, this does nothing. Otherwise, we already wrote it in, so set it forward to inactive. 
+            suspend = False
+            lastactive1, lastactive2 = [now()]*2
+            
+        #logs show that suspend probably happened here
+            
+        if user_inactive:
+            state = inactivestate
+            if statechange(laststatechange, now(), laststate, state):
+                laststatechange = now()
         else:
             application = w.get_application()
-            statechange((application.window_title+application.window_class+str(application.url),application))
-            
+            state = (application.window_title+application.window_class+str(application.url),application)
+            if statechange(laststatechange, now(), laststate, state):                
+                laststatechange = now()
+        laststate = state
+        print state,now()
+        sleep(0.05) 
+
 
 mainloop()
