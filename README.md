@@ -67,6 +67,7 @@ Implemented:
 - Track application usage
 - Analyzer shows you how much active time you spent in each application and window title, which domains and websites you spent most time on (Chromium only), sorted in descending order of duration
 - Analyzer allows you to select a date range that the statistics will be computed over, e.g today, past week, or custom date range. 
+- Proper support for system suspend (as of v1.02)
 
 Not implemented:
 
