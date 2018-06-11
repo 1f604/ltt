@@ -186,15 +186,15 @@ def mainloop():
             
         if user_inactive:
             state = inactivestate
-            if statechange(laststatechange, now(), laststate, state):
-                laststatechange = now()
+            if statechange(laststatechange, lastactive2, laststate, state):
+                laststatechange = lastactive2
         else:
             application = w.get_application()
             state = (application.window_title+application.window_class+str(application.url),application)
-            if statechange(laststatechange, now(), laststate, state):                
-                laststatechange = now()
+            if statechange(laststatechange, lastactive2, laststate, state):                
+                laststatechange = lastactive2
         laststate = state
-        print state,now()
+        print state,lastactive2
         sleep(0.05) 
 
 
